@@ -34,14 +34,29 @@ class Person:
         self.emotions[emotion] = intensity
 
     def take_action(self, action):
+        """
+        Records the action taken by the person and adds it to their action history.
+        Outputs the action and its context to the console.
+        """
         self.daily_action = action
         self.action_history.append(action)
+        
+        # Output action information to console
+        print(f"\n--- Action Taken by {self.name} ---")
+        print(f"Action: {action}")
+        print(f"Context:")
+        print(f"  - Current goals: {self.goals}")
+        print(f"  - Current emotions: {self.emotions}")
+        print(f"  - Relevant skills: {', '.join([f'{skill}: {level}' for skill, level in self.skills.items() if level > 5])}")
+        print("--- End of Action ---\n")
 
     def review_goals(self):
         """
         Reviews and potentially updates the person's goals based on their current state and recent actions.
         Uses AI to generate a response that may modify goals or suggest the next action.
+        Outputs the entire process to the console.
         """
+        # Construct a prompt for AI to review goals
         prompt = f"Review the goals for {self.name}, age {self.age}, occupation {self.occupation}, with personality {self.personality} and skills {self.skills}. Current goals: {self.goals}. Recent actions: {self.action_history[-5:]}. Current emotions: {self.emotions}. Revise the goals if needed. If they are not in need of revision, select an action for the next day."
         
         json_structure = {
@@ -51,28 +66,64 @@ class Person:
                     "actions": ["string"]
                 }
             ],
-            "next_action": "string"
+            "next_action": "string",
+            "reasoning": "string"  # New field to capture AI's reasoning
         }
         
+        # Generate AI response
         response = generate_ai_response(prompt, json_structure)
-        if 'goals' in response:
+        
+        # Output the entire process to console
+        print(f"\n--- Goal Review for {self.name} ---")
+        print(f"Current goals: {self.goals}")
+        print(f"AI reasoning: {response.get('reasoning', 'No reasoning provided')}")
+        
+        # Update goals if AI suggests changes
+        if 'goals' in response and response['goals'] != self.goals:
             self.goals = response['goals']
+            print(f"Updated goals: {self.goals}")
+        else:
+            print("Goals remain unchanged.")
+        
+        # Set next action if provided
         if 'next_action' in response:
             self.daily_action = response['next_action']
+            print(f"Next planned action: {self.daily_action}")
+        else:
+            print("No specific action planned for next day.")
+        
+        print("--- End of Goal Review ---\n")
 
     def plan_next_action(self):
         """
         Plans the next day's action for the person based on their current state.
         Uses AI to generate a suitable action considering various factors.
+        Outputs the entire planning process to the console.
         """
+        # Construct a prompt for AI to plan next action
         prompt = f"Plan the next day's action for {self.name}, considering their goals: {self.goals}, personality: {self.personality}, skills: {self.skills}, and current emotions: {self.emotions}."
         
         json_structure = {
-            "planned_action": "string"
+            "planned_action": "string",
+            "reasoning": "string",  # New field to capture AI's reasoning
+            "expected_outcome": "string"  # New field to predict the outcome
         }
         
+        # Generate AI response
         response = generate_ai_response(prompt, json_structure)
+        
+        # Output the entire process to console
+        print(f"\n--- Action Planning for {self.name} ---")
+        print(f"Current goals: {self.goals}")
+        print(f"AI reasoning: {response.get('reasoning', 'No reasoning provided')}")
+        
+        # Set the planned action
         self.daily_action = response.get("planned_action", "No action planned")
+        print(f"Planned action: {self.daily_action}")
+        
+        # Output expected outcome
+        print(f"Expected outcome: {response.get('expected_outcome', 'No outcome predicted')}")
+        print("--- End of Action Planning ---\n")
 
     def learn_from_experience(self, experience):
         """
