@@ -1,0 +1,22 @@
+{
+  "villagers": [
+    {
+      "name": "John Smith",
+      "age": 35,
+      "occupation": "Farmer",
+      "backstory": "Born and raised in the village, John has been farming since he was a young boy."
+    },
+    {
+      "name": "Emma Baker",
+      "age": 28,
+      "occupation": "Baker",
+      "backstory": "Emma moved to the village five years ago to open her own bakery."
+    },
+    {
+      "name": "Michael Johnson",
+      "age": 42,
+      "occupation": "Carpenter",
+      "backstory": "Michael learned carpentry from his father and has been crafting furniture for the village for over two decades."
+    }
+  ]
+}
