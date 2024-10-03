@@ -2,7 +2,13 @@ from utils.ai_helpers import generate_ai_response
 import json
 
 class Person:
+    """
+    Represents a villager in the simulation with various attributes and behaviors.
+    This class is central to modeling individual actions and interactions within the village.
+    """
+
     def __init__(self, name, age, occupation, personality, skills, relationships, backstory=None):
+        # Initialize basic attributes of a person
         self.name = name
         self.age = age
         self.occupation = occupation
@@ -10,6 +16,8 @@ class Person:
         self.skills = skills
         self.relationships = relationships
         self.backstory = backstory
+        
+        # Initialize dynamic attributes that will change during the simulation
         self.goals = []
         self.knowledge = {}
         self.emotions = {}
@@ -30,6 +38,10 @@ class Person:
         self.action_history.append(action)
 
     def review_goals(self):
+        """
+        Reviews and potentially updates the person's goals based on their current state and recent actions.
+        Uses AI to generate a response that may modify goals or suggest the next action.
+        """
         prompt = f"Review the goals for {self.name}, age {self.age}, occupation {self.occupation}, with personality {self.personality} and skills {self.skills}. Current goals: {self.goals}. Recent actions: {self.action_history[-5:]}. Current emotions: {self.emotions}. Revise the goals if needed. If they are not in need of revision, select an action for the next day."
         
         json_structure = {
@@ -49,6 +61,10 @@ class Person:
             self.daily_action = response['next_action']
 
     def plan_next_action(self):
+        """
+        Plans the next day's action for the person based on their current state.
+        Uses AI to generate a suitable action considering various factors.
+        """
         prompt = f"Plan the next day's action for {self.name}, considering their goals: {self.goals}, personality: {self.personality}, skills: {self.skills}, and current emotions: {self.emotions}."
         
         json_structure = {
@@ -59,6 +75,10 @@ class Person:
         self.daily_action = response.get("planned_action", "No action planned")
 
     def learn_from_experience(self, experience):
+        """
+        Updates the person's skills and knowledge based on a given experience.
+        Uses AI to determine how the experience affects the person's attributes.
+        """
         prompt = f"{self.name} just experienced: {experience}. How does this affect their skills or knowledge? Current skills: {self.skills}, Current knowledge: {self.knowledge}"
         
         json_structure = {
@@ -164,6 +184,10 @@ class Person:
 
     @classmethod
     def load_villagers(cls):
+        """
+        Class method to load villager data from a JSON file and create Person instances.
+        Generates personality and skills for each villager using AI.
+        """
         with open('data/people.json', 'r') as f:
             data = json.load(f)
         
@@ -173,8 +197,8 @@ class Person:
                 name=villager_data['name'],
                 age=villager_data['age'],
                 occupation=villager_data['occupation'],
-                personality={},  # We'll generate this with AI
-                skills={},       # We'll generate this with AI
+                personality={},  # Will be generated with AI
+                skills={},       # Will be generated with AI
                 relationships={},
                 backstory=villager_data.get('backstory')
             )
@@ -184,6 +208,10 @@ class Person:
         return villagers
 
     def generate_personality_and_skills(self):
+        """
+        Generates personality traits and skills for the person using AI.
+        This method is called during the initialization of each villager.
+        """
         prompt = f"Generate a personality and set of skills for {self.name}, a {self.age}-year-old {self.occupation}. Backstory: {self.backstory}"
         
         json_structure = {
@@ -204,4 +232,7 @@ class Person:
         self.skills = {skill: int(level) for skill, level in response.get('skills', {}).items()}
 
     def __str__(self):
+        """
+        Returns a string representation of the person.
+        """
         return f"{self.name}, {self.age} years old, {self.occupation}"
